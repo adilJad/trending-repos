@@ -3,9 +3,13 @@ package com.jadeddib.trendingrepos;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.jadeddib.trendingrepos.ui.TrendingFragment;
 
 public class MainActivity
         extends AppCompatActivity {
@@ -22,15 +26,20 @@ public class MainActivity
                 public boolean onNavigationItemSelected(
                         @NonNull
                                 MenuItem item) {
+
+                    Fragment fragment = null;
                     switch (item.getItemId()) {
                         case R.id.navigation_trending:
-                            mTextMessage.setText(R.string.title_trending);
-                            return true;
+                            fragment = new TrendingFragment();
+                            break;
                         case R.id.navigation_settings:
                             mTextMessage.setText(R.string.title_settings);
                             return true;
                     }
-                    return false;
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fl_container, new TrendingFragment());
+                    transaction.commit();
+                    return true;
                 }
             };
 
@@ -39,7 +48,10 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fl_container, new TrendingFragment());
+        transaction.commit();
+
         BottomNavigationView
                 navigation =
                 (BottomNavigationView) findViewById(R.id.navigation);

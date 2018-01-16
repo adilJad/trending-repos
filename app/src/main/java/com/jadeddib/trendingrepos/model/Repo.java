@@ -1,5 +1,7 @@
 package com.jadeddib.trendingrepos.model;
 
+import java.text.DecimalFormat;
+
 /**
  * Created by jad on 16/01/2018.
  */
@@ -67,9 +69,16 @@ public class Repo {
         return ratings;
     }
 
-    public void setRatings(String ratings) {
-        this.ratings =
-                ratings;
+    public void setRatings(int ratings) {
+        String sr;
+        if (ratings > 1000) {
+            DecimalFormat decimalFormat = new DecimalFormat("##.00");
+            Double r = ratings / 1000.0;
+            sr = decimalFormat.format(r) + "k";
+        } else {
+            sr = String.valueOf(ratings);
+        }
+        this.ratings = sr;
     }
 
     @Override

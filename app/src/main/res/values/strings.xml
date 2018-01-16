@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">TrendingRepos</string>
+    <string name="app_name">Trending Repos</string>
     <string name="title_trending">Trending</string>
     <string name="title_settings">Settings</string>
+    <string name="iv_ratings_content_desc">ratings icon</string>
+    <string name="iv_avatar_content_desc">User\'s avatar</string>
 </resources>

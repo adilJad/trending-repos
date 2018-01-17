@@ -34,8 +34,19 @@ import java.util.List;
 public class TrendingFragment extends Fragment {
 
     List<Repo> mRepos;
+    private int currentPage = 1;
+    private RepoItemAdapter mRepoItemAdapter;
+    ListView lvRepos;
+
+
 
     public TrendingFragment() {
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("LIST_STATE", lvRepos.onSaveInstanceState());
     }
 
     @Nullable
@@ -44,7 +55,29 @@ public class TrendingFragment extends Fragment {
                                      Bundle savedInstanceState) {
 
         final View view = inflater.inflate(R.layout.fragment_trending, container, false);
-        final ListView lvRepos = view.findViewById(R.id.lv_repos);
+        if (savedInstanceState == null) {
+            lvRepos =
+                    view.findViewById(R.id.lv_repos);
+            mRepos = new ArrayList<Repo>();
+            mRepoItemAdapter =
+                    new RepoItemAdapter(getContext(),new ArrayList<Repo>());
+            lvRepos.setAdapter(mRepoItemAdapter);
+            getReposFromGithub(currentPage);
+            lvRepos.setOnScrollListener(new EndlessScrollListener() {
+                @Override
+                public boolean onLoadMore(int page, int totalItemsCount) {
+                    currentPage++;
+                    getReposFromGithub(currentPage);
+                    return true;
+                }
+            });
+        } else {
+            lvRepos.onRestoreInstanceState(savedInstanceState.getParcelable("LIST_STATE"));
+        }
+        return view;
+    }
+
+    public void getReposFromGithub(final int page) {
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -55,12 +88,9 @@ public class TrendingFragment extends Fragment {
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("response", response);
-
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
                     JSONArray items = jsonResponse.getJSONArray("items");
-                    mRepos = new ArrayList<Repo>();
                     for (int i = 0; i < items.length(); i++) {
                         Repo repo = new Repo();
                         repo.setTitle(items.getJSONObject(i).getString("name"));
@@ -70,12 +100,16 @@ public class TrendingFragment extends Fragment {
                                 ("login"));
                         repo.setDescription(items.getJSONObject(i).getString("description"));
                         repo.setRatings(items.getJSONObject(i).getInt("stargazers_count"));
-                        Log.d("repo", repo.toString());
-
                         mRepos.add(repo);
                     }
-                    RepoItemAdapter repoItemAdapter = new RepoItemAdapter(getContext(), mRepos);
-                    lvRepos.setAdapter(repoItemAdapter);
+                    if (page == 1) {
+                        mRepoItemAdapter.addAll(mRepos);
+                    } else {
+                        mRepoItemAdapter.clear();
+                        mRepoItemAdapter.addAll(mRepos);
+                        mRepoItemAdapter.notifyDataSetChanged();
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -86,17 +120,14 @@ public class TrendingFragment extends Fragment {
         Date today = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Long todayInSeconds = today.getTime() / 1000;
-        System.out.println(todayInSeconds);
         long thirtyDaysInSeconds = (60 * 60 * 24 * 30);
         long startDateInSeconds = todayInSeconds - thirtyDaysInSeconds;
         Date nd = new Date(startDateInSeconds * 1000);
         String startDate = sdf.format(nd);
 
-        Log.d("startDate", startDate);
-
-        GetReposRequest getReposRequest = new GetReposRequest(startDate, listener, errorListener);
+        GetReposRequest getReposRequest = new GetReposRequest(startDate, currentPage, listener,
+                errorListener);
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
         requestQueue.add(getReposRequest);
-        return view;
     }
 }

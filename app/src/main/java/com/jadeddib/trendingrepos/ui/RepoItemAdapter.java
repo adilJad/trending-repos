@@ -40,6 +40,16 @@ public class RepoItemAdapter extends ArrayAdapter<Repo> {
         mInflater = LayoutInflater.from(context);
     }
 
+    public void addReposToList(List<Repo> repos) {
+        mRepos.addAll(repos);
+        this.notifyDataSetChanged();
+    }
+
+    @Override
+    public int getCount() {
+        return mRepos.size();
+    }
+
     @NonNull
     @Override
     public View getView(int position,
@@ -77,30 +87,17 @@ public class RepoItemAdapter extends ArrayAdapter<Repo> {
             this.imageView = imageView;
         }
 
-        /*
-            doInBackground(Params... params)
-                Override this method to perform a computation on a background thread.
-         */
         protected Bitmap doInBackground(String...urls){
             String urlOfImage = urls[0];
             Bitmap avatar = null;
             try{
                 InputStream is = new URL(urlOfImage).openStream();
-                /*
-                    decodeStream(InputStream is)
-                        Decode an input stream into a bitmap.
-                 */
                 avatar = BitmapFactory.decodeStream(is);
             }catch(Exception e){ // Catch the download exception
                 e.printStackTrace();
             }
             return avatar;
         }
-
-        /*
-            onPostExecute(Result result)
-                Runs on the UI thread after doInBackground(Params...).
-         */
         protected void onPostExecute(Bitmap result){
             imageView.setImageBitmap(result);
         }

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.jadeddib.trendingrepos.ui.SettingsFragment;
 import com.jadeddib.trendingrepos.ui.TrendingFragment;
 
 public class MainActivity
@@ -33,11 +34,11 @@ public class MainActivity
                             fragment = new TrendingFragment();
                             break;
                         case R.id.navigation_settings:
-                            mTextMessage.setText(R.string.title_settings);
-                            return true;
+                            fragment = new SettingsFragment();
+                            break;
                     }
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fl_container, new TrendingFragment());
+                    transaction.replace(R.id.fl_container, fragment);
                     transaction.commit();
                     return true;
                 }

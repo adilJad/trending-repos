@@ -15,8 +15,9 @@ import com.jadeddib.trendingrepos.ui.TrendingFragment;
 public class MainActivity
         extends AppCompatActivity {
 
-    private TextView
-            mTextMessage;
+
+    public static final String TRENDING_FRGAGMENT_TAG = "trendingFragment";
+    public static final String SETTINGS_FRAGMENT_TAG = "settingsFragment";
 
     private BottomNavigationView.OnNavigationItemSelectedListener
             mOnNavigationItemSelectedListener
@@ -24,17 +25,21 @@ public class MainActivity
             new BottomNavigationView.OnNavigationItemSelectedListener() {
 
                 @Override
-                public boolean onNavigationItemSelected(
-                        @NonNull
-                                MenuItem item) {
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                     Fragment fragment = null;
                     switch (item.getItemId()) {
                         case R.id.navigation_trending:
-                            fragment = new TrendingFragment();
+                            fragment = (TrendingFragment) getSupportFragmentManager().findFragmentByTag(TRENDING_FRGAGMENT_TAG);
+                            if (fragment == null) {
+                                fragment = new TrendingFragment();
+                            }
                             break;
                         case R.id.navigation_settings:
-                            fragment = new SettingsFragment();
+                            fragment = (SettingsFragment) getSupportFragmentManager().findFragmentByTag(SETTINGS_FRAGMENT_TAG);
+                            if (fragment == null) {
+                                fragment = new SettingsFragment();
+                            }
                             break;
                     }
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -50,7 +55,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fl_container, new TrendingFragment());
+        transaction.add(R.id.fl_container, new TrendingFragment());
         transaction.commit();
 
         BottomNavigationView
